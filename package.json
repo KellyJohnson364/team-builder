@@ -7,5 +7,19 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "inquirer": "^8.0.0",
+    "inquirer-loop": "^0.3.0",
+    "yes": "^1.1.1"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KellyJohnson364/team-builder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/KellyJohnson364/team-builder/issues"
+  },
+  "homepage": "https://github.com/KellyJohnson364/team-builder#readme"
 }

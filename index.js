@@ -1,71 +1,146 @@
 // packages needed for this application
-const inquirer = require('inquirer');
-const fs = require('fs');
+let inquirer = require('inquirer');
+let fs = require('fs');
+let Employee = require("./lib/Employee");
+let Engineer = require("./lib/Engineer");
+let Manager = require("./lib/Manager");
+let Intern = require("./lib/Intern");
+let html = require('./lib/generateHtml');
+
+let humanResources=[]
 
 
 
-
-const generateHTML = (answers) =>
-  `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-  <title>Document</title>
-</head>
-<body>
-  <div class="jumbotron jumbotron-fluid">
-  <div class="container">
-    <h1 class="display-4">Hi! My name is ${answers.name}</h1>
-    <p class="lead">I am from ${answers.id}.</p>
-    <h3>Example heading <span class="badge badge-secondary">Contact Me</span></h3>
-    <ul class="list-group">
-      <li class="list-group-item">My GitHub username is ${answers.github}</li>
-      <li class="list-group-item">LinkedIn: ${answers.email}</li>
-    </ul>
-  </div>
-</div>
-</body>
-</html>`;
-
-inquirer
-  .prompt([
+let questions = [
     {
-      type: 'input',
-      name: 'name',
-      message: 'What is the team manager\'s name?',
-    },
+    type: 'input',
+    name: 'name',
+    message: 'What is the team member\'s name?',
+    }, 
     {
       type: 'number',
       name: 'id',
-      message: 'What is your employee ID?',
+      message: 'What is the team member\'s id?',
     },
     {
       type: 'input',
-      name: 'email',
-      message: 'What is your email address?',
-    },
+        name: 'email',
+        message: 'What is the team member\'s email?',
+    }, 
     {
-      type: 'loop',
-      name: 'menu',
-      message: 'Would you like to add another employee?',
-    },
-    {
-      type: 'input',
-      name: 'github',
-      message: 'Enter engineer\s GitHub Username',when:function(data){data.menu === 'Add an Engineer'},
-    },
-    {
-      type: 'input',
-      name: 'linkedin',
-      message: 'Enter your LinkedIn URL.',
-    },
-  ])
-  .then((answers) => {
-    const htmlPageContent = generateHTML(answers);
+      type: 'number',
+      name: 'office',
+      message: 'What is the team member\'s office number?',
+    } 
+  ]
+  
+let gitQ = 
+  { 
+    type: 'input',
+    name: 'github',
+     message: 'What is the team member\'s GitHub user name?',
+  }
 
-    fs.writeFile('index.html', htmlPageContent, (err) =>
-      err ? console.log(err) : console.log('Successfully created index.html!')
-    );
-  });
+
+let schoolQ = 
+  {
+    type: 'input',
+    name: 'school',
+    message: 'What is the team member\'s school?',
+  }
+  
+  let choices = () => {
+   inquirer.prompt([
+      { type: 'list',
+      name: 'choice',
+      message: 'What would you like to do next?',
+      choices: ["Add an Engineer", "Add an Intern", "Finish entering team members"]
+      }
+
+    ])
+    
+    .then(data => {
+      if (data.choice === "Add an Engineer") {
+        questions.push(gitQ)
+        inquirer.prompt(questions)
+
+        .then((data) => {
+          humanResources.push(new Engineer(data.name, data.id, data.email, data.github));
+
+        }).catch((err) => console.log(err))
+        .then((data) => {
+          questions.pop()
+          choices()
+        }); 
+
+      } else if (data.choice ==="Add an Intern") {
+        questions.push(schoolQ)
+        inquirer.prompt(questions)
+
+        .then((data) => {
+          humanResources.push(new Intern(data.name, data.id, data.email, data.school));
+
+        }).catch((err) => console.log(err))
+
+        .then((data) => {
+          questions.pop()
+          choices()
+        }); 
+
+      } else {
+        renderIt()
+      }
+    })
+  }
+  
+let begin = () => {
+  inquirer.prompt(questions)
+        .then((data) => {
+        humanResources.push(new Manager(data.name, data.id, data.email, data.office));  
+
+        }).catch((err) => console.log(err))
+
+        .then((data) => {
+          questions.pop()
+          choices()
+        });
+}        
+
+
+begin()
+
+
+let renderIt = () => {
+  for (let i=0; i < humanResources.length; i++) {
+    console.log((humanResources[i].role))
+  html +=`
+  <div class="card" style="width: 18rem;">
+    <div class="card-body">
+      <h5 class="card-title">${humanResources[i].name}</h5>
+      <h6 class="card-subtitle mb-2 text-muted">${humanResources[i].role}</h6>
+      <a href="#" class="card-link">Email:${humanResources[i].email}</a>`
+      if (humanResources[i].role === "Manager") {
+        html+=`
+        <p class="card-text">Office number: ${humanResources[i].office}.</p>
+      </div>
+    </div>`
+      } else if (humanResources[i].role === "Engineer") {
+        html +=` 
+        <a href="#" class="card-link">${humanResources[i].github}</a>
+      </div>
+    </div>`
+      } else {
+        html += `
+        <p class="card-text">School: ${humanResources[i].school}.</p>
+      </div>
+    </div>`
+      }
+    }   html += `
+    </div>
+    </div>
+    </body>
+    </html>` 
+          fs.writeFile('./dist/index.html', html, (err) =>
+          err ? console.log(err) : console.log('Successfully created HTML')
+  );  
+  }
