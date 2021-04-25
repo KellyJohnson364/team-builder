@@ -114,33 +114,42 @@ let renderIt = () => {
   for (let i=0; i < humanResources.length; i++) {
     console.log((humanResources[i].role))
   html +=`
-  <div class="card" style="width: 18rem;">
-    <div class="card-body">
-      <h5 class="card-title">${humanResources[i].name}</h5>
-      <h6 class="card-subtitle mb-2 text-muted">${humanResources[i].role}</h6>
-      <a href="#" class="card-link">Email:${humanResources[i].email}</a>`
+        <div class="card m-4 text-center border" style="width: 18rem;">
+          <div class="card-body">
+            <div class="card-header  mb-4">
+              <h4 class="card-subtitle text-muted">${humanResources[i].role}</h4>
+            </div>
+            <div>
+              <h4 class="card-title">${humanResources[i].name}</h4>
+              <p class="card-text">Employee ID: ${humanResources[i].id}.</p>`
+       
       if (humanResources[i].role === "Manager") {
         html+=`
-        <p class="card-text">Office number: ${humanResources[i].office}.</p>
-      </div>
-    </div>`
+              <p class="card-text">Office number: ${humanResources[i].office}.</p>`
       } else if (humanResources[i].role === "Engineer") {
         html +=` 
-        <a href="#" class="card-link">${humanResources[i].github}</a>
-      </div>
-    </div>`
+              <span class="card-text">GitHub Profile:</span> <a target="_blank" href= "https://github.com/${humanResources[i].github}">${humanResources[i].github}</a> <br>`
       } else {
         html += `
-        <p class="card-text">School: ${humanResources[i].school}.</p>
-      </div>
-    </div>`
+              <p class="card-text">School: ${humanResources[i].school}.</p>`
       }
-    }   html += `
-    </div>
-    </div>
+        html += `
+            </div>
+            <div class="card-footer tm-4">
+              <span class="card-text tm-4">Email:</span><a target="_blank" href= "mailto:${humanResources[i].email}">${humanResources[i].email}</a>
+            </div> 
+          </div>
+        </div>` 
+    }
+      html +=`
+        </div>
+      </div>
     </body>
-    </html>` 
+  </html>` 
           fs.writeFile('./dist/index.html', html, (err) =>
           err ? console.log(err) : console.log('Successfully created HTML')
   );  
   }
+
+  
+  
